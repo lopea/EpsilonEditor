@@ -33,6 +33,9 @@ namespace Epsilon
         bool close_;
         double currentTime;
         std::chrono::time_point<std::chrono::high_resolution_clock> last;
+
+        //give access for the winproc to change values directly
+        friend __int64 __stdcall WinProc(HWND hwnd, unsigned int umsg, unsigned __int64 wparam, __int64 lparam);
     };
 }
 

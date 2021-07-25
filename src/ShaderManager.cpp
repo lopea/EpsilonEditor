@@ -6,15 +6,15 @@
 #include <glad/gl.h>
 #include <assert.h>
 #include <imgui.h>
-#include <gl/gl.h>
+#include <gl/GL.h>
 
 #include <iostream>
 
 float verts[] = {
-    -1, -1,
-    -1, 1,
-    1, -1,
-    1, 1,
+    -1, -1, 0,0,
+    -1, 1, 0,1,
+    1, -1, 1,0,
+    1, 1, 1,1
 };
 
 unsigned int indices[] = {
@@ -24,9 +24,20 @@ unsigned int indices[] = {
 namespace Epsilon
 {
     //store initial shaders
-    const char startVertex [] = "#version 450\nlayout(location = 0) in vec2 position; \
-                                layout (location = 0)out vec2 uv; void main(){ uv = vec2(1); gl_Position = vec4(position, 0, 1); }";
-    const char startFragment[] = "#version 450\nuniform float time;\n layout(location = 0) in vec2 uv;\nout vec4 fragColor;\nvoid main() {\n\tfragColor = vec4 (0, 1,1,1);\n}";
+    const char startVertex [] = "#version 330\n\
+out InData\n\
+{\
+vec2 uv;\
+vec2 outpos;\
+}data;\
+layout (location = 0) in vec2 position;\
+layout (location = 1) in vec2 uv;\
+void main() {\n\
+gl_Position = vec4(position, 0, 1);\
+data.outpos = position;\
+data.uv = uv;\
+}";
+    const char startFragment[] = "#version 450\nuniform float time;\nin InData\n{\n  vec2 uv;\n  vec2 outpos;\n}data;\nout vec4 fragColor;\nvoid main()\n{\n  fragColor = vec4(sin(time + data.uv.x),sin(dot(data.uv,data.uv) +time), atan(data.uv));\n}";
 
 
     ShaderManager::ShaderManager()
@@ -71,9 +82,21 @@ namespace Epsilon
 
     void ShaderManager::CreateImguiWindow()
     {
-      ImGui::SetNextWindowBgAlpha(0.75f);
-      ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-      ImGui::SetNextWindowPos({0,0});
+      ImVec2 barsize;
+      ImVec2 screenPos = ImGui::GetIO().DisplaySize;
+      if(ImGui::BeginMainMenuBar())
+      {
+        if(ImGui::BeginMenu("File"))
+        {
+          ImGui::Selectable("lmao");
+          ImGui::EndMenu();
+        }
+        barsize = ImGui::GetWindowSize();
+        ImGui::EndMainMenuBar();
+      }
+      ImGui::SetNextWindowBgAlpha(0.50f);
+      ImGui::SetNextWindowSize({screenPos.x, screenPos.y - barsize.y});
+      ImGui::SetNextWindowPos({0,barsize.y});
       ImGui::Begin("Shader Editor", nullptr, ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
       TextEditor::Palette palette = editor.GetPalette();
       palette[(int)TextEditor::PaletteIndex::Background] = 0x00000000;
@@ -81,11 +104,11 @@ namespace Epsilon
       editor.Render("render");
       if(!errMsg_.empty())
       {
-        ImVec2 errorPos = ImGui::GetIO().DisplaySize;
-        errorPos.y *= 0.15f;
-        ImGui::SetNextWindowBgAlpha(1.f);
+
+        screenPos.y *= 0.15f;
+        ImGui::SetNextWindowBgAlpha(.90f);
         ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y *0.85f});
-        ImGui::BeginChild("Error Message",errorPos, false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+        ImGui::BeginChild("Error Message",screenPos, false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
         ImGui::Text("%s", errMsg_.c_str());
         ImGui::EndChild();
       }
@@ -183,12 +206,29 @@ namespace Epsilon
       //attach the shader handles
       glAttachShader(program, fragmentHandle);
 
+      glAttachShader(program, vertexHandle);
+
       //link the shader
       glLinkProgram(program);
 
       //we have big issues if this does not link
       glGetProgramiv(program, GL_LINK_STATUS, &err);
-      assert( err);
+
+      //cant link shader, send message
+      if(!err)
+      {
+        //get length of the info log
+        int length;
+
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+
+
+        //set the size for the error message
+        errMsg_.resize(length + 1);
+
+        //get the message
+        glGetProgramInfoLog(program, length + 1 , &length, errMsg_.data());
+      }
     }
 
     void ShaderManager::Render(double time)
@@ -224,8 +264,12 @@ namespace Epsilon
 
 
       //set attrib
-      glVertexAttribPointer(0, 2, GL_FLOAT, false, sizeof(float) *2 , nullptr);
+      glVertexAttribPointer(0, 2, GL_FLOAT, false, sizeof(float) * 4, nullptr);
       glEnableVertexAttribArray(0);
+
+      //uv attrib
+      glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(float) * 4, (void*)(sizeof(float) * 2));
+      glEnableVertexAttribArray(1);
 
       //unbind object
       glBindVertexArray(0);

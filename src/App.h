@@ -5,7 +5,7 @@
 #ifndef EPSILONEDITOR_APP_H
 #define EPSILONEDITOR_APP_H
 #include "Window.h"
-#include "../ShaderManager.h"
+#include "ShaderManager.h"
 
 namespace Epsilon
 {
