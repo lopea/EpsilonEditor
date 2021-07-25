@@ -2,3 +2,6 @@
 	path = lib/imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
+[submodule "ImguiText"]
+	path = lib/ImguiText
+	url = https://github.com/lopea/ImGuiColorTextEdit
