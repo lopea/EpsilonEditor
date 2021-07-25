@@ -3,12 +3,14 @@
 //
 
 #include "App.h"
+#include "ImGuiEnvironment.h"
 
 namespace Epsilon
 {
     App::App() : window(800, 600)
     {
-
+      ImGuiEnvironment::Initialize();
+      ImGuiEnvironment::LinkWindow(&window);
     }
 
     void App::Run()
@@ -16,6 +18,11 @@ namespace Epsilon
       while(!window.WillClose())
       {
         window.ClearFrame();
+        ImGuiEnvironment::NewFrame();
+
+
+
+        ImGuiEnvironment::Render();
 
         window.SwapBuffers();
       }
@@ -24,6 +31,6 @@ namespace Epsilon
 
     App::~App()
     {
-
+      ImGuiEnvironment::Shutdown();
     }
 }

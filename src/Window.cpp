@@ -9,8 +9,11 @@
 #define WIN32_EXTRA_LEAN
 #include <Windows.h>
 #include <stdexcept>
+#include "ImGuiEnvironment.h"
 #include <glad/gl.h>
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern IMGUI_IMPL_API void     ImGui_ImplWin32_EnableDpiAwareness();
 
 PIXELFORMATDESCRIPTOR pfd
 
@@ -18,7 +21,7 @@ PIXELFORMATDESCRIPTOR pfd
         sizeof(PIXELFORMATDESCRIPTOR),1,
         PFD_DRAW_TO_WINDOW|PFD_SUPPORT_OPENGL|PFD_DOUBLEBUFFER,PFD_TYPE_RGBA,32,0,
         0,0,0,0,0,8,0,0,
-        0,0,0,0,32,0,0,
+        0,0,0,0,24,8,0,
         PFD_MAIN_PLANE,0, 0,0,0
     };
 namespace Epsilon
@@ -33,8 +36,11 @@ namespace Epsilon
       }
       return res;
     }
+
     LRESULT CALLBACK WinProc(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
     {
+      if(ImGuiEnvironment::IsInitialized() && ImGui_ImplWin32_WndProcHandler(hwnd, umsg, wparam, lparam))
+        return true;
       if(umsg == WM_CLOSE || umsg == WM_DESTROY )
       {
         PostQuitMessage(0);
@@ -42,8 +48,10 @@ namespace Epsilon
       }
       return DefWindowProc(hwnd, umsg, wparam, lparam);
     }
+
     Window::Window(int width, int height)
     {
+      ImGui_ImplWin32_EnableDpiAwareness();
       //create window class
       WNDCLASS windowClass;
 
@@ -104,13 +112,16 @@ namespace Epsilon
         exit(0xF00BA12);
 
       //initalize glad
-      gladLoadGL(reinterpret_cast<GLADloadfunc>(DumbProcAddress));
+      if(!gladLoadGL(reinterpret_cast<GLADloadfunc>(DumbProcAddress)))
+        exit(0xF00BA12);
+
+
 
       //initialize variables
       close_ = false;
       dimensions_[0] = width;
       dimensions_[1] = height;
-
+      glViewport(0,0, dimensions_[0], dimensions_[1]);
 
     }
 
@@ -137,7 +148,8 @@ namespace Epsilon
 
     void Window::ClearFrame()
     {
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glViewport(0,0, dimensions_[0], dimensions_[1]);
+      glClear(GL_COLOR_BUFFER_BIT);
     }
 
     void Window::SetClearColor(float r, float g, float b, float a)

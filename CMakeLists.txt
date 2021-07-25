@@ -12,7 +12,7 @@ set(CMAKE_CXX_FLAGS "/W4 /WX")
 
 find_package(OpenGL)
 
-add_executable(EpsilonEditor main.cpp src/App.cpp src/App.h src/Window.cpp src/Window.h)
+add_executable(EpsilonEditor main.cpp src/App.cpp src/App.h src/Window.cpp src/Window.h src/ImGuiEnvironment.cpp src/ImGuiEnvironment.h)
 
-target_link_libraries(EpsilonEditor OpenGL::GL glad)
+target_link_libraries(EpsilonEditor OpenGL::GL glad imgui)
 

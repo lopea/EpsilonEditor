@@ -18,6 +18,7 @@ namespace Epsilon
         void ClearFrame();
         void SetClearColor(float r,float g, float b, float a);
         ~Window();
+        [[nodiscard]] const HWND GetHandle() const {return handle_;}
         bool WillClose() const {return close_; };
         void SwapBuffers();
     private:
