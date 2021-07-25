@@ -26,7 +26,7 @@ PIXELFORMATDESCRIPTOR pfd
     };
 namespace Epsilon
 {
-    void* DumbProcAddress(const char* location)
+    void* Window::DumbProcAddress(const char* location)
     {
       void* res = wglGetProcAddress(location);
       if(!res || res == (void*)0x1 || res == (void*)0x2 || res == (void*)0x3 || res == (void*)-1)
@@ -121,6 +121,8 @@ namespace Epsilon
       close_ = false;
       dimensions_[0] = width;
       dimensions_[1] = height;
+      currentTime = 0;
+      last = std::chrono::high_resolution_clock::now();
       glViewport(0,0, dimensions_[0], dimensions_[1]);
 
     }
@@ -135,6 +137,10 @@ namespace Epsilon
           TranslateMessage(&msg);
           DispatchMessage(&msg);
         }
+
+        //update time
+        currentTime = std::chrono::duration<double>(last - std::chrono::high_resolution_clock::now()).count();
+        //swap the buffers
       ::SwapBuffers(hDC_);
     }
 

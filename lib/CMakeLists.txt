@@ -11,6 +11,7 @@ target_sources(imgui INTERFACE imgui/imgui.cpp
         imgui/imgui_tables.cpp
         imgui/imgui_widgets.cpp
         imgui/backends/imgui_impl_win32.cpp
-        imgui/backends/imgui_impl_opengl3.cpp)
+        imgui/backends/imgui_impl_opengl3.cpp
+        ImguiText/TextEditor.cpp)
 
-target_include_directories(imgui INTERFACE imgui)
+target_include_directories(imgui INTERFACE imgui ImguiText)

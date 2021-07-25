@@ -8,11 +8,11 @@ add_subdirectory(lib)
 set(CMAKE_CXX_STANDARD 17)
 
 #set any flags
-set(CMAKE_CXX_FLAGS "/W4 /WX")
+set(CMAKE_CXX_FLAGS "/W3 /WX /EHsc")
 
 find_package(OpenGL)
 
-add_executable(EpsilonEditor main.cpp src/App.cpp src/App.h src/Window.cpp src/Window.h src/ImGuiEnvironment.cpp src/ImGuiEnvironment.h)
+add_executable(EpsilonEditor main.cpp src/App.cpp src/App.h src/Window.cpp src/Window.h src/ImGuiEnvironment.cpp src/ImGuiEnvironment.h ShaderManager.cpp ShaderManager.h)
 
 target_link_libraries(EpsilonEditor OpenGL::GL glad imgui)
 

@@ -5,6 +5,8 @@
 #ifndef EPSILONEDITOR_APP_H
 #define EPSILONEDITOR_APP_H
 #include "Window.h"
+#include "../ShaderManager.h"
+
 namespace Epsilon
 {
     class App
@@ -18,6 +20,7 @@ namespace Epsilon
 
     private:
         Window window;
+        ShaderManager manager_;
     };
 }
 
