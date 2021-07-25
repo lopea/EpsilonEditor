@@ -94,7 +94,7 @@ data.uv = uv;\
         barsize = ImGui::GetWindowSize();
         ImGui::EndMainMenuBar();
       }
-      ImGui::SetNextWindowBgAlpha(0.50f);
+      ImGui::SetNextWindowBgAlpha(0);
       ImGui::SetNextWindowSize({screenPos.x, screenPos.y - barsize.y});
       ImGui::SetNextWindowPos({0,barsize.y});
       ImGui::Begin("Shader Editor", nullptr, ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
