@@ -37,9 +37,7 @@ gl_Position = vec4(position, 0, 1);\
 data.outpos = position;\
 data.uv = uv;\
 }";
-    const char startFragment[] = "#version 450\nuniform float time;\nin InData\n{\n  vec2 uv;\n  vec2 outpos;\n}data;\nout vec4 fragColor;\nvoid main()\n{\n  fragColor = vec4(sin(time + data.uv.x),sin(dot(data.uv,data.uv) +time), atan(data.uv));\n}";
-
-
+    const char startFragment[] = "#version 450\nlayout(std140, binding = 0) uniform UniformData\n{\n\tfloat time;\n\tvec4 mouse;\n\tvec2 resolution;\n};\nin InData\n{\n  vec2 uv;\n  vec2 outpos;\n};\nout vec4 fragColor;\nvoid main()\n{\n\tvec2 u = -1. + 2. * uv;\n\tvec2 r = cos(2./(u.x) * atan(u.x, u.y) + time) - sin( u+ 1./length((u )));\n\tfragColor = vec4(r.yxxy);\n}";
     ShaderManager::ShaderManager()
     : program(0), needsUpdate_(false), data_(startFragment), errMsg_(), fragmentHandle(0), vertexHandle(0)
     {
@@ -49,6 +47,7 @@ data.uv = uv;\
       editor.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
       InitializeMesh();
       InitializeShader();
+      InitializeUniformBuffer();
       TextEditor::Palette palette = editor.GetPalette();
       palette[(int)TextEditor::PaletteIndex::Background] = 0xAA000000;
       editor.SetPalette(palette);
@@ -61,17 +60,18 @@ data.uv = uv;\
       glDeleteShader(vertexHandle);
       glDeleteProgram(program);
 
-      unsigned buffs[] = {vbo_,ebo_};
+      unsigned buffs[] = {vbo_, ebo_, ubo_};
       glDeleteBuffers(2, buffs);
 
       glDeleteVertexArrays(1, &vao_);
+
     }
 
-    void ShaderManager::Update(double time)
+    void ShaderManager::Update(const UniformData &data)
     {
       ImGui::GetStyle().ChildRounding = 0;
       ImGui::GetStyle().ChildBorderSize = 0;
-      Render(time);
+      Render(data);
       CreateImguiWindow();
 
 
@@ -84,16 +84,6 @@ data.uv = uv;\
     {
       ImVec2 barsize;
       ImVec2 screenPos = ImGui::GetIO().DisplaySize;
-      if(ImGui::BeginMainMenuBar())
-      {
-        if(ImGui::BeginMenu("File"))
-        {
-          ImGui::Selectable("lmao");
-          ImGui::EndMenu();
-        }
-        barsize = ImGui::GetWindowSize();
-        ImGui::EndMainMenuBar();
-      }
       ImGui::SetNextWindowBgAlpha(0);
       ImGui::SetNextWindowSize({screenPos.x, screenPos.y - barsize.y});
       ImGui::SetNextWindowPos({0,barsize.y});
@@ -104,7 +94,7 @@ data.uv = uv;\
       editor.Render("render");
       if(!errMsg_.empty())
       {
-
+        screenPos.x = 0;
         screenPos.y *= 0.15f;
         ImGui::SetNextWindowBgAlpha(.90f);
         ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y *0.85f});
@@ -231,13 +221,13 @@ data.uv = uv;\
       }
     }
 
-    void ShaderManager::Render(double time)
+    void ShaderManager::Render(const UniformData &data)
     {
         if(CanRender())
         {
+          ApplyUniforms(data);
           glUseProgram(program);
           glBindVertexArray(vao_);
-          glUniform1f(glGetUniformLocation(program, "time"), (float)time);
           glDrawElements(GL_TRIANGLES, _countof(indices), GL_UNSIGNED_INT, 0);
           glUseProgram(0);
         }
@@ -273,5 +263,28 @@ data.uv = uv;\
 
       //unbind object
       glBindVertexArray(0);
+    }
+
+    void ShaderManager::ApplyUniforms(const UniformData &data)
+    {
+      //send the current uniform data to the shader
+      glBindBuffer(GL_UNIFORM_BUFFER, ubo_);
+      glBufferSubData(GL_UNIFORM_BUFFER,0, sizeof(UniformData), &data);
+      glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+      glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo_);
+    }
+
+    void ShaderManager::InitializeUniformBuffer()
+    {
+      //create handle for the uniform buffer
+      glGenBuffers(1, &ubo_);
+
+      //intialize buffer data
+      glBindBuffer(GL_UNIFORM_BUFFER, ubo_);
+      glBufferData(GL_UNIFORM_BUFFER, sizeof(UniformData), nullptr, GL_DYNAMIC_DRAW);
+      glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+
     }
 }

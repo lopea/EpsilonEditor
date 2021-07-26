@@ -22,14 +22,19 @@ namespace Epsilon
         void SetClearColor(float r,float g, float b, float a);
         ~Window();
         [[nodiscard]] const HWND GetHandle() const {return handle_;}
-        bool WillClose() const {return close_; };
+        [[nodiscard]] bool WillClose() const {return close_; };
         void SwapBuffers();
-        double GetCurrentTime() const {return currentTime;}
+        [[nodiscard]] double GetCurrentTime() const {return currentTime;}
+        [[nodiscard]] const int* GetResolution() const { return dimensions_;}
+        [[nodiscard]] const int* GetMouse() const {return mouse_;}
+        [[nodiscard]] const int* GetPosition() const { return mouse_;}
     private:
         HWND handle_;
         HDC hDC_;
         HGLRC hGLRC_;
         int dimensions_[2]{0};
+        int pos_[2]{0};
+        int mouse_[4]{0};
         bool close_;
         double currentTime;
         std::chrono::time_point<std::chrono::high_resolution_clock> last;

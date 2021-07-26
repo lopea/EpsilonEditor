@@ -25,7 +25,7 @@ int attribs[] = {
     WGL_CONTEXT_MINOR_VERSION_ARB, 6,
     WGL_CONTEXT_PROFILE_MASK_ARB,
     WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-    0,0
+    0, 0
 };
 
 PIXELFORMATDESCRIPTOR pfd
@@ -62,22 +62,49 @@ namespace Epsilon
         if (ImGuiEnvironment::IsInitialized() && ImGui_ImplWin32_WndProcHandler(hwnd, umsg, wparam, lparam))
           return true;
 
-        //check if the window will close (either through the exit button or the task mgr)
-        if (umsg == WM_CLOSE || umsg == WM_DESTROY)
+        switch (umsg)
         {
-          //tell the program that we want to quit
-          PostQuitMessage(0);
-          return 0;
-        }
-          //check if the window size has changed
-        else if (umsg == WM_SIZE)
-        {
-          //store the new window size
-          RECT rec{};
-          //get the new dimensions of the window
-          GetWindowRect(hwnd, &rec);
-          windowHandle->dimensions_[0] = rec.right - rec.left;
-          windowHandle->dimensions_[1] = rec.bottom - rec.top;
+            //check if the window will close (either through the exit button or the task mgr)
+          case WM_CLOSE:
+          case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
+            //check if the window size has changed
+          case WM_SIZE:
+          {
+            //store the new window size
+            RECT rec{};
+            //get the new dimensions of the window
+            GetWindowRect(hwnd, &rec);
+            windowHandle->dimensions_[0] = rec.right - rec.left;
+            windowHandle->dimensions_[1] = rec.bottom - rec.top;
+            return true;
+          }
+            //get left mouse click
+          case WM_LBUTTONDOWN:
+            windowHandle->mouse_[2] = true;
+            break;
+            //get left mouse release
+          case WM_LBUTTONUP:
+            windowHandle->mouse_[2] = false;
+            //get right mouse click
+          case WM_RBUTTONDOWN:
+            windowHandle->mouse_[3] = true;
+            break;
+            //get left mouse release
+          case WM_RBUTTONUP:
+            windowHandle->mouse_[3] = false;
+            //get window position on change
+          case WM_WINDOWPOSCHANGED:
+          {
+            //get window values
+            WINDOWPOS* pos = (WINDOWPOS*)lparam;
+
+            //set position
+            windowHandle->pos_[0] = pos->x;
+            windowHandle->pos_[1] = pos->y;
+
+          }
 
         }
       }
@@ -146,7 +173,7 @@ namespace Epsilon
 
 
       //create an opengl context
-      hGLRC_ = wglCreateContextAttribsARB(hDC_, 0,attribs);
+      hGLRC_ = wglCreateContextAttribsARB(hDC_, 0, attribs);
       if (!hGLRC_)
         exit(0xF00BA12);
 
@@ -170,6 +197,10 @@ namespace Epsilon
       currentTime = 0;
       last = std::chrono::high_resolution_clock::now();
 
+      //get position of the window
+      pos_[0] = (GetSystemMetrics(SM_CXSCREEN) - rec.right + rec.left) / 2;
+      pos_[0] = (GetSystemMetrics(SM_CYSCREEN) - rec.bottom + rec.top) / 2;
+
       //set the dimensions for openGL
       glViewport(0, 0, dimensions_[0], dimensions_[1]);
 
@@ -177,6 +208,7 @@ namespace Epsilon
       glversion = glGetString(GL_VERSION);
 
       std::cout << glversion << std::endl;
+
 
     }
 
@@ -193,6 +225,17 @@ namespace Epsilon
 
       //update time
       currentTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - last).count();
+
+      //get the current mouse data
+      POINT mouse;
+      GetCursorPos(&mouse);
+
+      //update mouse data for the next frame
+      memcpy(mouse_, &mouse, sizeof(float) * 2);
+
+      //get window position
+
+
       //swap the buffers
       ::SwapBuffers(hDC_);
     }

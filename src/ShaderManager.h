@@ -13,12 +13,17 @@ namespace Epsilon
     class ShaderManager
     {
     public:
-
+        struct UniformData
+        {
+            float time;
+            float mouse[4];
+            float resolution[2];
+        };
         ShaderManager();
-        void Render(double time);
+        void Render(const UniformData &time);
 
         bool CanRender() const { return program != 0;}
-        void Update(double time);
+        void Update(const UniformData &data);
 
         ~ShaderManager();
 
@@ -29,13 +34,15 @@ namespace Epsilon
         void CreateImguiWindow();
         void InitializeShader();
         void InitializeMesh();
+        void InitializeUniformBuffer();
+        void ApplyUniforms(const UniformData &data);
         unsigned program;
         bool needsUpdate_;
         std::string data_;
 
         std::string errMsg_;
         unsigned fragmentHandle, vertexHandle;
-        unsigned vbo_, vao_, ebo_;
+        unsigned vbo_, vao_, ebo_, ubo_;
         TextEditor editor;
         float last;
     };

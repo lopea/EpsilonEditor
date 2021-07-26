@@ -19,6 +19,8 @@ namespace Epsilon
         ~App();
 
     private:
+        void UpdateData();
+        ShaderManager::UniformData data{};
         Window window;
         ShaderManager manager_;
     };
