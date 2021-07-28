@@ -4,11 +4,24 @@
 
 #include "App.h"
 #include "ImGuiEnvironment.h"
-
+#include <filesystem>
+#include <iostream>
+#include <fstream>
 namespace Epsilon
 {
     App::App() : window(1024, 768)
     {
+
+      //check if a shader has been saved
+      if(std::filesystem::exists("last.glsl"))
+      {
+        //open the file
+        std::ifstream file ("last.glsl");
+
+        //get contents of the file
+        std::string contents((std::istream_iterator<char>(file)),(std::istream_iterator<char>()));
+
+      }
       ImGuiEnvironment::Initialize();
       ImGuiEnvironment::LinkWindow(&window);
     }
@@ -31,7 +44,18 @@ namespace Epsilon
 
     App::~App()
     {
+      //open previous file shader
+      std::ofstream prevShaderFile("last.glsl");
+      if(prevShaderFile.is_open())
+      {
+        prevShaderFile << manager_.GetData();
+      }
+      else
+      {
+        std::cerr << "EPSILON ERROR: Unable to open last.glsl!!!! Loss of data is expected!!!" << std::endl;
+      }
       ImGuiEnvironment::Shutdown();
+
     }
 
     void App::UpdateData()
@@ -52,8 +76,7 @@ namespace Epsilon
         data.mouse[i] = newValue;
 
         //update mouse clicks
-        data.mouse[2] = (float)mouse[2];
-        data.mouse[3] = (float)mouse[3];
+        data.mouse[i + 2] = (float)mouse[i + 2];
       }
 
       //flip y value for mouse

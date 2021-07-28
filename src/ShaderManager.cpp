@@ -37,7 +37,7 @@ gl_Position = vec4(position, 0, 1);\
 data.outpos = position;\
 data.uv = uv;\
 }";
-    const char startFragment[] = "#version 450\nlayout(std140, binding = 0) uniform UniformData\n{\n\tfloat time;\n\tvec4 mouse;\n\tvec2 resolution;\n};\nin InData\n{\n  vec2 uv;\n  vec2 outpos;\n};\nout vec4 fragColor;\nvoid main()\n{\n\tvec2 u = -1. + 2. * uv;\n\tvec2 r = cos(2./(u.x) * atan(u.x, u.y) + time) - sin( u+ 1./length((u )));\n\tfragColor = vec4(r.yxxy);\n}";
+    const char startFragment[] = "#version 450\nlayout(std140, binding = 0) uniform UniformData\n{\n\tvec4 mouse;\n\tvec2 resolution;\n\tfloat time;\n};\nin InData\n{\n  vec2 uv;\n  vec2 outpos;\n};\nout vec4 fragColor;\nvoid main()\n{\n\tvec2 u = -1. + 2. * uv;\n\tvec2 r = cos(2./(u.x) * atan(u.x, u.y) + time) - sin( u+ 1./length((u )));\n\tfragColor = vec4(r.yxxy);\n}";
     ShaderManager::ShaderManager()
     : program(0), needsUpdate_(false), data_(startFragment), errMsg_(), fragmentHandle(0), vertexHandle(0)
     {
@@ -286,5 +286,10 @@ data.uv = uv;\
       glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 
+    }
+
+    void ShaderManager::SetData(const std::string& data)
+    {
+      editor.SetText(data);
     }
 }

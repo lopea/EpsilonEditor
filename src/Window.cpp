@@ -94,6 +94,7 @@ namespace Epsilon
             //get left mouse release
           case WM_RBUTTONUP:
             windowHandle->mouse_[3] = false;
+            break;
             //get window position on change
           case WM_WINDOWPOSCHANGED:
           {

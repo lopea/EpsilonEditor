@@ -15,9 +15,9 @@ namespace Epsilon
     public:
         struct UniformData
         {
-            float time;
             float mouse[4];
             float resolution[2];
+            float time;
         };
         ShaderManager();
         void Render(const UniformData &time);
@@ -27,6 +27,8 @@ namespace Epsilon
 
         ~ShaderManager();
 
+        void SetData(const std::string& data);
+        [[nodiscard]] std::string GetData() const {return editor.GetText();}
         void ForceRefresh() { needsUpdate_ = true; }
 
 
