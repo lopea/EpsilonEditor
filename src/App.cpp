@@ -11,16 +11,17 @@ namespace Epsilon
 {
     App::App() : window(1024, 768)
     {
-
       //check if a shader has been saved
       if(std::filesystem::exists("last.glsl"))
       {
         //open the file
-        std::ifstream file ("last.glsl");
+        std::ifstream file ("last.glsl" , std::ios_base::binary );
 
         //get contents of the file
-        std::string contents((std::istream_iterator<char>(file)),(std::istream_iterator<char>()));
+        std::vector<char> fileData((std::istreambuf_iterator<char>(file)),(std::istreambuf_iterator<char>()));
 
+
+        manager_.SetData(std::string(fileData.begin(),fileData.end()));
       }
       ImGuiEnvironment::Initialize();
       ImGuiEnvironment::LinkWindow(&window);
