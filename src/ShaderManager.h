@@ -44,6 +44,7 @@ namespace Epsilon
         unsigned fragmentHandle, vertexHandle;
         unsigned vbo_, vao_, ebo_, ubo_;
         ImGuiHandler imguiHandle_;
+        bool modified_;
         float last;
     };
 }
