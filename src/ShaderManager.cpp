@@ -39,18 +39,17 @@ data.uv = uv;\
 }";
     const char startFragment[] = "#version 450\nlayout(std140, binding = 0) uniform UniformData\n{\n\tvec4 mouse;\n\tvec2 resolution;\n\tfloat time;\n};\nin InData\n{\n  vec2 uv;\n  vec2 outpos;\n};\nout vec4 fragColor;\nvoid main()\n{\n\tvec2 u = -1. + 2. * uv;\n\tvec2 r = cos(2./(u.x) * atan(u.x, u.y) + time) - sin( u+ 1./length((u )));\n\tfragColor = vec4(r.yxxy);\n}";
     ShaderManager::ShaderManager()
-    : program(0), needsUpdate_(false), data_(startFragment), errMsg_(), fragmentHandle(0), vertexHandle(0)
+    : program(0), needsUpdate_(false), data_(startFragment), fragmentHandle(0), vertexHandle(0)
     {
 
       //this feels like cheating...
-      editor.SetText(data_);
-      editor.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
+      imguiHandle_.SetEditorText(data_);
+
+      //setup data for the shader renderer
       InitializeMesh();
       InitializeShader();
       InitializeUniformBuffer();
-      TextEditor::Palette palette = editor.GetPalette();
-      palette[(int)TextEditor::PaletteIndex::Background] = 0xAA000000;
-      editor.SetPalette(palette);
+
 
     }
 
@@ -69,45 +68,27 @@ data.uv = uv;\
 
     void ShaderManager::Update(const UniformData &data)
     {
-      ImGui::GetStyle().ChildRounding = 0;
-      ImGui::GetStyle().ChildBorderSize = 0;
       Render(data);
-      CreateImguiWindow();
 
+      //render any imgui windows to the screen
+      imguiHandle_.Render();
 
-      if (data_.size() != editor.GetText().size() || needsUpdate_)
+      //check if the shader has been modified and update
+      if (data_.size() != imguiHandle_.GetEditorCount() || needsUpdate_)
         InitializeShader();
 
-    }
-
-    void ShaderManager::CreateImguiWindow()
-    {
-      ImVec2 barsize;
-      ImVec2 screenPos = ImGui::GetIO().DisplaySize;
-      ImGui::SetNextWindowBgAlpha(0);
-      ImGui::SetNextWindowSize({screenPos.x, screenPos.y - barsize.y});
-      ImGui::SetNextWindowPos({0,barsize.y});
-      ImGui::Begin("Shader Editor", nullptr, ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-      TextEditor::Palette palette = editor.GetPalette();
-      palette[(int)TextEditor::PaletteIndex::Background] = 0x00000000;
-      editor.SetPalette(palette);
-      editor.Render("render");
-      if(!errMsg_.empty())
+      //check for any changes that the user wants
+      WantFlags flags = imguiHandle_.GetWantFlags();
+      if(flags & wSave)
       {
-        screenPos.x = 0;
-        screenPos.y *= 0.15f;
-        ImGui::SetNextWindowBgAlpha(.90f);
-        ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y *0.85f});
-        ImGui::BeginChild("Error Message",screenPos, false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
-        ImGui::Text("%s", errMsg_.c_str());
-        ImGui::EndChild();
+
       }
-      ImGui::End();
     }
 
     void ShaderManager::InitializeShader()
     {
-      data_ = editor.GetText();
+      std::string errMsg_;
+      data_ = imguiHandle_.GetEditorString();
 //store the shader handle for the fragment stage
       GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -136,12 +117,13 @@ data.uv = uv;\
 
         //get the actual message of the error and store it on to the err string
         glGetShaderInfoLog(fragment, length + 1, &length, errMsg_.data());
+        imguiHandle_.SetErrorText(errMsg_);
 
         glDeleteShader(fragment);
         //dont do anything
         return;
       }
-      errMsg_.clear();
+      imguiHandle_.ClearErrorText();
       //update the handle and delete the previous program if necessary
       if(fragmentHandle)
       {
@@ -218,6 +200,8 @@ data.uv = uv;\
 
         //get the message
         glGetProgramInfoLog(program, length + 1 , &length, errMsg_.data());
+
+        imguiHandle_.SetErrorText(errMsg_);
       }
     }
 
@@ -290,6 +274,6 @@ data.uv = uv;\
 
     void ShaderManager::SetData(const std::string& data)
     {
-      editor.SetText(data);
+      imguiHandle_.SetEditorText(data);
     }
 }

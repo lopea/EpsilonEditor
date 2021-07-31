@@ -7,6 +7,7 @@
 
 #include <string>
 #include <TextEditor.h>
+#include "ImGuiHandler.h"
 
 namespace Epsilon
 {
@@ -28,12 +29,11 @@ namespace Epsilon
         ~ShaderManager();
 
         void SetData(const std::string& data);
-        [[nodiscard]] std::string GetData() const {return editor.GetText();}
+        [[nodiscard]] std::string GetData() const {return imguiHandle_.GetEditorString();}
         void ForceRefresh() { needsUpdate_ = true; }
 
 
     private:
-        void CreateImguiWindow();
         void InitializeShader();
         void InitializeMesh();
         void InitializeUniformBuffer();
@@ -41,11 +41,9 @@ namespace Epsilon
         unsigned program;
         bool needsUpdate_;
         std::string data_;
-
-        std::string errMsg_;
         unsigned fragmentHandle, vertexHandle;
         unsigned vbo_, vao_, ebo_, ubo_;
-        TextEditor editor;
+        ImGuiHandler imguiHandle_;
         float last;
     };
 }
