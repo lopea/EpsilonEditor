@@ -32,8 +32,8 @@ namespace Epsilon
 
 
         void SetEditorText(const std::string &text) { editor_.SetText(text); }
-        void SetErrorText(const std::string &text) { errMsg_ = text; }
-        void ClearErrorText() { errMsg_.clear(); }
+        void SetErrorText(const std::string &text);
+        void ClearErrorText();
         WantFlags GetWantFlags() const {return wantFlags_;}
     private:
         void RenderBar();

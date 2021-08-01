@@ -15,3 +15,10 @@ target_sources(imgui INTERFACE imgui/imgui.cpp
         ImguiText/TextEditor.cpp)
 
 target_include_directories(imgui INTERFACE imgui ImguiText)
+
+# add the nfd library
+add_library(nfd INTERFACE
+        nfd/src/nfd_common.c
+        nfd/src/nfd_win.cpp
+        )
+target_include_directories(nfd INTERFACE nfd/include)

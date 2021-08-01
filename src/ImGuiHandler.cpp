@@ -2,6 +2,7 @@
 // Created by Javier on 7/31/2021.
 //
 
+#include <iostream>
 #include "ImGuiHandler.h"
 
 namespace Epsilon
@@ -12,6 +13,7 @@ namespace Epsilon
       editor_.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
       TextEditor::Palette palette = editor_.GetPalette();
       palette[(int)TextEditor::PaletteIndex::Background] = 0x00000000;
+      palette[(int)TextEditor::PaletteIndex::ErrorMarker] = 0xFF0000AA;
       editor_.SetPalette(palette);
 
     }
@@ -68,6 +70,39 @@ namespace Epsilon
       }
     }
 
+    void ImGuiHandler::SetErrorText(const std::string &text)
+    {
+      errMsg_ = text;
+      if(!errMsg_.empty())
+      {
+        std::size_t pos = errMsg_.find('\n');
+       std::string line = errMsg_.substr(0, pos);
+        TextEditor::ErrorMarkers marker;
+
+        while (pos != std::string::npos)
+       {
+         std::cout << line << std::endl;
+         std::size_t prev = pos;
+         std::size_t errorNum = line.find("0:");
+         if(errorNum != std::string::npos)
+         {
+
+           errorNum += 2;
+           marker.emplace(std::stoi(line.substr(errorNum)), line.substr(errorNum + 3));
+         }
+
+         editor_.SetErrorMarkers(marker);
+         pos = errMsg_.find('\n', pos + 1);
+         line = errMsg_.substr(prev + 1, pos - prev);
+       }
+      }
+    }
+
+    void ImGuiHandler::ClearErrorText()
+    {
+      errMsg_.clear();
+      editor_.SetErrorMarkers(TextEditor::ErrorMarkers());
+    }
 
 
 }

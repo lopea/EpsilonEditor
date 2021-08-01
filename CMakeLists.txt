@@ -10,9 +10,22 @@ set(CMAKE_CXX_STANDARD 17)
 #set any flags
 set(CMAKE_CXX_FLAGS "/W3 /WX /EHsc")
 
-find_package(OpenGL)
+find_package(OpenGL REQUIRED)
 
-add_executable(EpsilonEditor main.cpp src/App.cpp src/App.h src/Window.cpp src/Window.h src/ImGuiEnvironment.cpp src/ImGuiEnvironment.h src/ShaderManager.cpp src/ShaderManager.h src/ImGuiHandler.cpp src/ImGuiHandler.h FileHelper.cpp FileHelper.h)
+add_executable(EpsilonEditor
+        main.cpp
+        src/App.cpp
+        src/App.h
+        src/Window.cpp
+        src/Window.h
+        src/ImGuiEnvironment.cpp
+        src/ImGuiEnvironment.h
+        src/ShaderManager.cpp
+        src/ShaderManager.h
+        src/ImGuiHandler.cpp
+        src/ImGuiHandler.h
+        src/FileHelper.cpp
+        src/FileHelper.h)
 
-target_link_libraries(EpsilonEditor OpenGL::GL glad imgui)
+target_link_libraries(EpsilonEditor OpenGL::GL glad imgui nfd)
 
