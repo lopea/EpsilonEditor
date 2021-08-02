@@ -16,6 +16,7 @@ namespace Epsilon
       palette[(int)TextEditor::PaletteIndex::ErrorMarker] = 0xFF0000AA;
       editor_.SetPalette(palette);
 
+      editor_.SetImGuiChildIgnored(true);
     }
 
     void ImGuiHandler::Render()
@@ -25,23 +26,22 @@ namespace Epsilon
       ImGui::GetStyle().ChildBorderSize = 0;
       ImVec2 screenPos = ImGui::GetIO().DisplaySize;
       ImGui::SetNextWindowBgAlpha(0);
-      ImGui::SetNextWindowSize({screenPos.x, screenPos.y - barSize_.y});
+      ImGui::SetNextWindowSize({screenPos.x, (  errMsg_.empty() ? screenPos.y : screenPos.y * .85f) - barSize_.y});
       ImGui::SetNextWindowPos({0,barSize_.y});
       ImGui::Begin("Shader Editor", nullptr, ImGuiWindowFlags_NoMove |ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
       editor_.Render("render");
-
+      ImGui::End();
       if(!errMsg_.empty())
       {
-        screenPos.x = 0;
         screenPos.y *= 0.15f;
         ImGui::SetNextWindowBgAlpha(.90f);
         ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y *0.85f});
-        ImGui::BeginChild("Error Message",screenPos, false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+        ImGui::SetNextWindowSize(screenPos);
+        ImGui::Begin("Error Message",nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar );
         ImGui::Text("%s", errMsg_.c_str());
-        ImGui::EndChild();
+        ImGui::End();
       }
 
-      ImGui::End();
     }
 
     void ImGuiHandler::RenderBar()
