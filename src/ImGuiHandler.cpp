@@ -73,34 +73,55 @@ namespace Epsilon
     void ImGuiHandler::SetErrorText(const std::string &text)
     {
       errMsg_ = text;
-      if(!errMsg_.empty())
-      {
-        std::size_t pos = errMsg_.find('\n');
-       std::string line = errMsg_.substr(0, pos);
-        TextEditor::ErrorMarkers marker;
-
-        while (pos != std::string::npos)
-       {
-         std::cout << line << std::endl;
-         std::size_t prev = pos;
-         std::size_t errorNum = line.find("0:");
-         if(errorNum != std::string::npos)
-         {
-
-           errorNum += 2;
-           marker.emplace(std::stoi(line.substr(errorNum)), line.substr(errorNum + 3));
-         }
-
-         editor_.SetErrorMarkers(marker);
-         pos = errMsg_.find('\n', pos + 1);
-         line = errMsg_.substr(prev + 1, pos - prev);
-       }
-      }
+      FindErrorMarkers();
     }
 
     void ImGuiHandler::ClearErrorText()
     {
       errMsg_.clear();
+      ClearErrorMarkers();
+    }
+
+    void ImGuiHandler::FindErrorMarkers()
+    {
+      std::size_t pos = errMsg_.find('\n');
+      std::string line = errMsg_.substr(0, pos);
+      TextEditor::ErrorMarkers marker;
+
+      while (pos != std::string::npos)
+      {
+        //store the beginning of the line
+        std::size_t prev = pos;
+
+        //check if the current line contains an error in the shader
+        std::size_t errorNum = line.find("0:");
+
+        //if the current line does contain a line in the shader,
+        if(errorNum != std::string::npos)
+        {
+          //move to line number
+          errorNum += 2;
+          std::size_t lineNumSize = 0;
+          //get the line number
+          int lineNum = std::stoi(line.substr(errorNum), &lineNumSize);
+
+          //add the line number and the error message to the error marker database
+          marker.emplace(lineNum, line.substr(errorNum + lineNumSize + 2));
+        }
+
+        //find the next line in the error message
+        pos = errMsg_.find('\n', pos + 1);
+        line = errMsg_.substr(prev + 1, pos - prev);
+      }
+
+      //send the error marker to the editor
+      editor_.SetErrorMarkers(marker);
+
+    }
+
+    void ImGuiHandler::ClearErrorMarkers()
+    {
+      //remove all errors that are marked in the editor
       editor_.SetErrorMarkers(TextEditor::ErrorMarkers());
     }
 

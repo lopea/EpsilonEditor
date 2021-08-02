@@ -37,10 +37,12 @@ namespace Epsilon
         WantFlags GetWantFlags() const {return wantFlags_;}
     private:
         void RenderBar();
+        void FindErrorMarkers();
+        void ClearErrorMarkers();
         ImVec2 barSize_;
         TextEditor editor_;
         std::string errMsg_;
-        WantFlags wantFlags_;
+        WantFlags wantFlags_{};
 
 
 
