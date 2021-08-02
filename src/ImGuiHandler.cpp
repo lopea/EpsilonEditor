@@ -58,6 +58,16 @@ namespace Epsilon
 
         if (ImGui::BeginMenu("File"))
         {
+          if (ImGui::MenuItem("Open", "Ctrl + O"))
+          {
+            std::string result = FileHelper::ShowOpenDialog();
+            if (!result.empty())
+            {
+              std::string content;
+              FileHelper::Load(result, content);
+              SetEditorText(content);
+            }
+          }
           if (ImGui::MenuItem("New Shader...", "Ctrl + N"))
           {
             wantFlags_ |= wNewShader;
@@ -66,13 +76,12 @@ namespace Epsilon
           {
             wantFlags_ |= wSave;
 
-            if(location_.empty())
+            if (location_.empty())
             {
               location_ = FileHelper::ShowSaveDialogAndSave(GetEditorString());
-            }
-            else
+            } else
             {
-              FileHelper::Save(location_,GetEditorString());
+              FileHelper::Save(location_, GetEditorString());
             }
           }
           if (ImGui::MenuItem("Save As", "Ctrl + S"))
