@@ -7,7 +7,7 @@
 
 #include <string>
 #include <TextEditor.h>
-
+#include <functional>
 namespace Epsilon
 {
     enum WantFlagBit
@@ -39,9 +39,13 @@ namespace Epsilon
         void RenderBar();
         void FindErrorMarkers();
         void ClearErrorMarkers();
+        void UpdateModals();
         ImVec2 barSize_;
         TextEditor editor_;
+        std::string location_;
         std::string errMsg_;
+        bool showModifiedModal_ = false;
+        std::function<void()> onModalConfirm_;
         WantFlags wantFlags_{};
 
 

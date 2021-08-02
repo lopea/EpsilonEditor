@@ -4,14 +4,19 @@
 
 #ifndef EPSILONEDITOR_FILEHELPER_H
 #define EPSILONEDITOR_FILEHELPER_H
+
 #include <string>
 
 namespace Epsilon
 {
     class FileHelper
     {
-      static void Save(const std::string& location, const std::string& data);
-      static void Load(const std::string& location, std::string& dataHandle);
+    public:
+        static std::string ShowSaveDialogAndSave(const std::string &content);
+        static std::string ShowOpenDialog();
+        static void Save(const std::string &location, const std::string &data);
+
+        static void Load(const std::string &location, std::string &dataHandle);
     };
 }
 

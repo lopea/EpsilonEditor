@@ -8,7 +8,7 @@ add_subdirectory(lib)
 set(CMAKE_CXX_STANDARD 17)
 
 #set any flags
-set(CMAKE_CXX_FLAGS "/W3 /WX /EHsc")
+set(CMAKE_CXX_FLAGS "/W3 /WX /EHsc /D_CRT_SECURE_NO_WARNINGS")
 
 find_package(OpenGL REQUIRED)
 
@@ -26,6 +26,7 @@ add_executable(EpsilonEditor
         src/ImGuiHandler.h
         src/FileHelper.cpp
         src/FileHelper.h)
+
 
 target_link_libraries(EpsilonEditor OpenGL::GL glad imgui nfd)
 
