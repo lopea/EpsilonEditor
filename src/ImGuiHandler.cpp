@@ -40,7 +40,7 @@ namespace Epsilon
         ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y * 0.85f});
         ImGui::SetNextWindowSize(screenPos);
         ImGui::Begin("Error Message", nullptr,
-                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoFocusOnAppearing);
         ImGui::Text("%s", errMsg_.c_str());
         ImGui::End();
       }
@@ -70,6 +70,7 @@ namespace Epsilon
           }
           if (ImGui::MenuItem("New Shader...", "Ctrl + N"))
           {
+            SetEditorText(startString_);
             wantFlags_ |= wNewShader;
           }
           if (ImGui::MenuItem("Save", "Ctrl + S"))
@@ -79,7 +80,8 @@ namespace Epsilon
             if (location_.empty())
             {
               location_ = FileHelper::ShowSaveDialogAndSave(GetEditorString());
-            } else
+            }
+            else
             {
               FileHelper::Save(location_, GetEditorString());
             }

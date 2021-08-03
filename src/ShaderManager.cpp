@@ -44,6 +44,7 @@ data.uv = uv;\
 
       //this feels like cheating...
       imguiHandle_.SetEditorText(data_);
+      imguiHandle_.SetStartString(startFragment);
 
       //setup data for the shader renderer
       InitializeMesh();

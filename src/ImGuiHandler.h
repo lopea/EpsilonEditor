@@ -30,7 +30,7 @@ namespace Epsilon
 
         [[nodiscard]] std::size_t GetEditorCount() const { return editor_.GetText().size();};
 
-
+        void SetStartString(const char* string) { startString_ = string;};
         void SetEditorText(const std::string &text) { editor_.SetText(text); }
         void SetErrorText(const std::string &text);
         void ClearErrorText();
@@ -40,8 +40,11 @@ namespace Epsilon
         void FindErrorMarkers();
         void ClearErrorMarkers();
         void UpdateModals();
+
+
         ImVec2 barSize_;
         TextEditor editor_;
+        const char * startString_;
         std::string location_;
         std::string errMsg_;
         bool showModifiedModal_ = false;
