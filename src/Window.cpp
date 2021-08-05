@@ -210,6 +210,11 @@ namespace Epsilon
 
       std::cout << glversion << std::endl;
 
+      //set vsync
+      PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC )DumbProcAddress("wglSwapIntervalEXT");
+
+      if(wglSwapIntervalEXT)
+        wglSwapIntervalEXT(1);
 
     }
 
@@ -233,9 +238,6 @@ namespace Epsilon
 
       //update mouse data for the next frame
       memcpy(mouse_, &mouse, sizeof(float) * 2);
-
-      //get window position
-
 
       //swap the buffers
       ::SwapBuffers(hDC_);

@@ -39,12 +39,9 @@ data.uv = uv;\
 }";
     const char startFragment[] = "#version 450\nlayout(std140, binding = 0) uniform UniformData\n{\n\tvec4 mouse;\n\tvec2 resolution;\n\tfloat time;\n};\nin InData\n{\n  vec2 uv;\n  vec2 outpos;\n};\nout vec4 fragColor;\nvoid main()\n{\n\tvec2 u = -1. + 2. * uv;\n\tvec2 r = cos(2./(u.x) * atan(u.x, u.y) + time) - sin( u+ 1./length((u )));\n\tfragColor = vec4(r.yxxy);\n}";
     ShaderManager::ShaderManager()
-    : program(0), needsUpdate_(false), data_(startFragment), fragmentHandle(0), vertexHandle(0)
+    : program_(0), needsUpdate_(false), data_(startFragment), fragmentHandle_(0), vertexHandle_(0)
     {
-
-      //this feels like cheating...
-      imguiHandle_.SetEditorText(data_);
-      imguiHandle_.SetStartString(startFragment);
+      
 
       //setup data for the shader renderer
       InitializeMesh();
@@ -56,9 +53,9 @@ data.uv = uv;\
 
     ShaderManager::~ShaderManager()
     {
-      glDeleteShader(fragmentHandle);
-      glDeleteShader(vertexHandle);
-      glDeleteProgram(program);
+      glDeleteShader(fragmentHandle_);
+      glDeleteShader(vertexHandle_);
+      glDeleteProgram(program_);
 
       unsigned buffs[] = {vbo_, ebo_, ubo_};
       glDeleteBuffers(2, buffs);
@@ -67,29 +64,22 @@ data.uv = uv;\
 
     }
 
-    void ShaderManager::Update(const UniformData &data)
+    void ShaderManager::Update(const UniformData &data, ImGuiHandler &handler)
     {
       Render(data);
 
-      //render any imgui windows to the screen
-      imguiHandle_.Render();
-
       //check if the shader has been modified and update
-      if (data_.size() != imguiHandle_.GetEditorCount() || needsUpdate_)
-        InitializeShader();
-
-      //check for any changes that the user wants
-      WantFlags flags = imguiHandle_.GetWantFlags();
-      if(flags & wSave)
+      if (data_.size() != handler.GetEditorCount() || needsUpdate_)
       {
-
+        data_ = handler.GetEditorString();
+        InitializeShader();
+        handler.SetErrorText(errMsg_);
       }
     }
 
     void ShaderManager::InitializeShader()
     {
-      std::string errMsg_;
-      data_ = imguiHandle_.GetEditorString();
+
 //store the shader handle for the fragment stage
       GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
 
@@ -118,55 +108,55 @@ data.uv = uv;\
 
         //get the actual message of the error and store it on to the err string
         glGetShaderInfoLog(fragment, length + 1, &length, errMsg_.data());
-        imguiHandle_.SetErrorText(errMsg_);
 
         glDeleteShader(fragment);
         //dont do anything
         return;
       }
-      imguiHandle_.ClearErrorText();
-      //update the handle and delete the previous program if necessary
-      if(fragmentHandle)
+      errMsg_.clear();
+
+      //update the handle and delete the previous program_ if necessary
+      if(fragmentHandle_)
       {
-        glDeleteShader(fragmentHandle);
-        glDeleteProgram(program);
+        glDeleteShader(fragmentHandle_);
+        glDeleteProgram(program_);
 
       }
 
-      fragmentHandle = fragment;
+      fragmentHandle_ = fragment;
 
       //create the vertex shader if it hasnt been initialized yet
-      if(!vertexHandle)
+      if(!vertexHandle_)
       {
         //store any errors
         int verr;
 
         //create the shader handle
-        vertexHandle = glCreateShader(GL_VERTEX_SHADER);
+        vertexHandle_ = glCreateShader(GL_VERTEX_SHADER);
 
         //get the shader code
         const char* v = ((const char*)startVertex);
 
         //set it to the handle
-        glShaderSource(vertexHandle, 1, &v, nullptr);
+        glShaderSource(vertexHandle_, 1, &v, nullptr);
 
         //compile the shader
-        glCompileShader(vertexHandle);
+        glCompileShader(vertexHandle_);
 
 
         //check if it compiled successfully
-        glGetShaderiv(vertexHandle, GL_COMPILE_STATUS, &verr);
+        glGetShaderiv(vertexHandle_, GL_COMPILE_STATUS, &verr);
         if(!verr)
         {
           //get the length of the error message
           int length;
-          glGetShaderiv(vertexHandle,GL_INFO_LOG_LENGTH, &length);
+          glGetShaderiv(vertexHandle_,GL_INFO_LOG_LENGTH, &length);
 
           //set the error message to the new length of the error message
           errMsg_.resize(length + 1);
 
           //get the actual message of the error and store it on to the err string
-          glGetShaderInfoLog(vertexHandle, length + 1, &length, errMsg_.data());
+          glGetShaderInfoLog(vertexHandle_, length + 1, &length, errMsg_.data());
           std::cerr<< errMsg_ <<std::endl;
 
         }
@@ -174,18 +164,18 @@ data.uv = uv;\
       }
 
       //create a new one
-      program = glCreateProgram();
+      program_ = glCreateProgram();
 
       //attach the shader handles
-      glAttachShader(program, fragmentHandle);
+      glAttachShader(program_, fragmentHandle_);
 
-      glAttachShader(program, vertexHandle);
+      glAttachShader(program_, vertexHandle_);
 
       //link the shader
-      glLinkProgram(program);
+      glLinkProgram(program_);
 
       //we have big issues if this does not link
-      glGetProgramiv(program, GL_LINK_STATUS, &err);
+      glGetProgramiv(program_, GL_LINK_STATUS, &err);
 
       //cant link shader, send message
       if(!err)
@@ -193,16 +183,15 @@ data.uv = uv;\
         //get length of the info log
         int length;
 
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+        glGetProgramiv(program_, GL_INFO_LOG_LENGTH, &length);
 
 
         //set the size for the error message
         errMsg_.resize(length + 1);
 
         //get the message
-        glGetProgramInfoLog(program, length + 1 , &length, errMsg_.data());
+        glGetProgramInfoLog(program_, length + 1 , &length, errMsg_.data());
 
-        imguiHandle_.SetErrorText(errMsg_);
       }
     }
 
@@ -211,7 +200,7 @@ data.uv = uv;\
         if(CanRender())
         {
           ApplyUniforms(data);
-          glUseProgram(program);
+          glUseProgram(program_);
           glBindVertexArray(vao_);
           glDrawElements(GL_TRIANGLES, _countof(indices), GL_UNSIGNED_INT, 0);
           glUseProgram(0);
@@ -273,8 +262,4 @@ data.uv = uv;\
 
     }
 
-    void ShaderManager::SetData(const std::string& data)
-    {
-      imguiHandle_.SetEditorText(data);
-    }
 }

@@ -20,8 +20,7 @@ namespace Epsilon
         //get contents of the file
         std::vector<char> fileData((std::istreambuf_iterator<char>(file)),(std::istreambuf_iterator<char>()));
 
-
-        manager_.SetData(std::string(fileData.begin(),fileData.end()));
+        imgui_.SetEditorText(std::string(fileData.begin(),fileData.end()));
       }
       ImGuiEnvironment::Initialize();
       ImGuiEnvironment::LinkWindow(&window);
@@ -31,13 +30,22 @@ namespace Epsilon
     {
       while(!window.WillClose())
       {
+        //begin render process
         window.ClearFrame();
-        ImGuiEnvironment::NewFrame();
+
 
         UpdateData();
-        manager_.Update(data);
+
+        //update shader and render it to the screen
+        manager_.Update(data_, imgui_);
+
+        //update any imgui calls
+        imgui_.Render();
+
+        //render any imgui calls to the screen
         ImGuiEnvironment::Render();
 
+        //finish rendering
         window.SwapBuffers();
       }
 
@@ -69,22 +77,22 @@ namespace Epsilon
       //update x and y coordinates for both mouse and resolution
       for(int i = 0 ; i < 2; i ++)
       {
-        data.resolution[i] = (float)res[i];
+        data_.resolution[i] = (float)res[i];
         //update mouse to be in normalized window space
         float newValue = (float)mouse[i];
         newValue -= (float)pos[i];
-        newValue /= data.resolution[i];
-        data.mouse[i] = newValue;
+        newValue /= data_.resolution[i];
+        data_.mouse[i] = newValue;
 
         //update mouse clicks
-        data.mouse[i + 2] = (float)mouse[i + 2];
+        data_.mouse[i + 2] = (float)mouse[i + 2];
       }
 
       //flip y value for mouse
-      data.mouse[1] = data.resolution[1] - data.mouse[1];
+      data_.mouse[1] = data_.resolution[1] - data_.mouse[1];
 
       //update time
-      data.time = (float)window.GetCurrentTime();
+      data_.time = (float)window.GetCurrentTime();
 
     }
 }

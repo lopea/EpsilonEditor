@@ -5,6 +5,7 @@
 #include <iostream>
 #include "ImGuiHandler.h"
 #include "FileHelper.h"
+#include "ImGuiEnvironment.h"
 
 namespace Epsilon
 {
@@ -22,6 +23,9 @@ namespace Epsilon
 
     void ImGuiHandler::Render()
     {
+      ImGuiEnvironment::NewFrame();
+
+
       RenderBar();
       ImGui::GetStyle().ChildRounding = 0;
       ImGui::GetStyle().ChildBorderSize = 0;
@@ -33,6 +37,8 @@ namespace Epsilon
                    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
       editor_.Render("render");
       ImGui::End();
+
+
       if (!errMsg_.empty())
       {
         screenPos.y *= 0.15f;
@@ -43,6 +49,8 @@ namespace Epsilon
                      ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoFocusOnAppearing);
         ImGui::Text("%s", errMsg_.c_str());
         ImGui::End();
+
+        ImGuiEnvironment::Render();
       }
 
     }

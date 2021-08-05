@@ -21,31 +21,38 @@ namespace Epsilon
             float time;
         };
         ShaderManager();
-        void Render(const UniformData &time);
 
-        bool CanRender() const { return program != 0;}
-        void Update(const UniformData &data);
+
+        bool CanRender() const { return program_ != 0;}
+        void Update(const UniformData &data, ImGuiHandler &handler);
 
         ~ShaderManager();
 
-        void SetData(const std::string& data);
-        [[nodiscard]] std::string GetData() const {return imguiHandle_.GetEditorString();}
+        [[nodiscard]] std::string GetData() const {return data_;}
         void ForceRefresh() { needsUpdate_ = true; }
 
 
     private:
         void InitializeShader();
+
         void InitializeMesh();
+
         void InitializeUniformBuffer();
+
         void ApplyUniforms(const UniformData &data);
-        unsigned program;
+
+        void Render(const UniformData &time);
+
+
+        unsigned program_;
         bool needsUpdate_;
-        std::string data_;
-        unsigned fragmentHandle, vertexHandle;
+        std::string data_, errMsg_;
+
+        unsigned fragmentHandle_, vertexHandle_;
         unsigned vbo_, vao_, ebo_, ubo_;
-        ImGuiHandler imguiHandle_;
+
         bool modified_;
-        float last;
+        float last_;
     };
 }
 

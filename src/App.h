@@ -19,10 +19,20 @@ namespace Epsilon
         ~App();
 
     private:
+        //! Update any uniform data for the current frame
         void UpdateData();
-        ShaderManager::UniformData data{};
+
+        //! store any data from the cpu that will get sent to the GPU
+        ShaderManager::UniformData data_{};
+
+        //! References the window that will show the shader on the screen
         Window window;
+
+        //! Stores the shader that will get sent to the screen
         ShaderManager manager_;
+
+        //! Stores and handles any imgui data that will be used as proper UI.
+        ImGuiHandler imgui_;
     };
 }
 
