@@ -13,14 +13,19 @@ namespace Epsilon
     class Texture
     {
     public:
-        Texture();
-        void InitializeTexture();
+        Texture(const std::string& textureLocation);
+
+        void ChangeTextureLocation(const std::string& location);
         ~Texture();
+
         void ChangeFilter(GLenum filter);
         void ChangeWrapping(GLenum wrapping);
     private:
+        void InitializeTexture();
+        void Cleanup();
         bool initialized_;
         GLuint reference_;
+        int height_, width_, channels_;
         GLenum wrap_, filter_;
         std::string location_;
     };

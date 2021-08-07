@@ -1,7 +1,8 @@
 #add the glad library
 add_subdirectory(glad)
 
-
+#include stb libraries
+add_subdirectory(stb)
 
 #add files for the imgui library
 
