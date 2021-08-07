@@ -66,9 +66,10 @@ data.uv = uv;\
 
     void ShaderManager::Update(const UniformData &data, ImGuiHandler &handler)
     {
+
+
       Render(data);
 
-      //check if the shader has been modified and update
       if (data_.size() != handler.GetEditorCount() || needsUpdate_)
       {
         data_ = handler.GetEditorString();
@@ -120,7 +121,6 @@ data.uv = uv;\
       {
         glDeleteShader(fragmentHandle_);
         glDeleteProgram(program_);
-
       }
 
       fragmentHandle_ = fragment;
@@ -260,6 +260,11 @@ data.uv = uv;\
       glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 
+    }
+
+    const char *ShaderManager::GetStartShader()
+    {
+      return startFragment;
     }
 
 }

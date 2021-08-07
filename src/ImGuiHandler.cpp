@@ -6,6 +6,7 @@
 #include "ImGuiHandler.h"
 #include "FileHelper.h"
 #include "ImGuiEnvironment.h"
+#include "ShaderManager.h"
 
 namespace Epsilon
 {
@@ -19,6 +20,8 @@ namespace Epsilon
       editor_.SetPalette(palette);
 
       editor_.SetImGuiChildIgnored(true);
+      editor_.SetText(ShaderManager::GetStartShader());
+      startString_ = ShaderManager::GetStartShader();
     }
 
     void ImGuiHandler::Render()

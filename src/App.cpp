@@ -17,10 +17,13 @@ namespace Epsilon
         //open the file
         std::ifstream file ("last.glsl" , std::ios_base::binary );
 
-        //get contents of the file
-        std::vector<char> fileData((std::istreambuf_iterator<char>(file)),(std::istreambuf_iterator<char>()));
+       if(file.is_open())
+        {
+          //get contents of the file
+          std::vector<char> fileData((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
 
-        imgui_.SetEditorText(std::string(fileData.begin(),fileData.end()));
+          imgui_.SetEditorText(std::string(fileData.begin(), fileData.end()));
+        }
       }
       ImGuiEnvironment::Initialize();
       ImGuiEnvironment::LinkWindow(&window);

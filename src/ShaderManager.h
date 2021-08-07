@@ -31,6 +31,7 @@ namespace Epsilon
         [[nodiscard]] std::string GetData() const {return data_;}
         void ForceRefresh() { needsUpdate_ = true; }
 
+        static const char* GetStartShader();
 
     private:
         void InitializeShader();
