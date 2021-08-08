@@ -39,6 +39,17 @@ PIXELFORMATDESCRIPTOR pfd
     };
 namespace Epsilon
 {
+    //huge thanks for https://kg1992.github.io/articles/C++-OpenGL-glDebugMessageCallback-sample.html that helped me out
+    void glMessageCallback( GLenum source,
+                            GLenum type,
+                            GLuint id,
+                            GLenum severity,
+                            GLsizei length,
+                            const GLchar* message,
+                            const void* userParam)
+    {
+        std::cerr << "OPENGL Message: "  << message << std::endl;
+    }
     void *Window::DumbProcAddress(const char *location)
     {
       void *res = wglGetProcAddress(location);
@@ -186,8 +197,11 @@ namespace Epsilon
       if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(DumbProcAddress)))
         exit(0xF00BA12);
 
-
-
+      //initialize any debug logs
+#ifndef NDEBUG
+      glEnable(GL_DEBUG_OUTPUT);
+      glDebugMessageCallback(glMessageCallback, 0);
+#endif
       //store reference to this class instance in the handle
       SetWindowLongPtr(handle_, GWLP_USERDATA, (LONG_PTR) this);
 
@@ -216,6 +230,8 @@ namespace Epsilon
       if(wglSwapIntervalEXT)
         wglSwapIntervalEXT(1);
 
+
+
     }
 
 
@@ -241,6 +257,7 @@ namespace Epsilon
 
       //swap the buffers
       ::SwapBuffers(hDC_);
+
     }
 
     Window::~Window()
