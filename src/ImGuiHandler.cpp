@@ -30,6 +30,11 @@ namespace Epsilon
 
 
       RenderBar();
+      if(editor_.IsTextChanged() && !needsUpdating_)
+        isDirty_ = true;
+
+      if(needsUpdating_)
+        needsUpdating_ = false;
       ImGui::GetStyle().ChildRounding = 0;
       ImGui::GetStyle().ChildBorderSize = 0;
       ImVec2 screenPos = ImGui::GetIO().DisplaySize;
@@ -55,7 +60,7 @@ namespace Epsilon
 
         ImGuiEnvironment::Render();
       }
-
+      UpdateModals();
     }
 
     void ImGuiHandler::RenderBar()
@@ -71,17 +76,44 @@ namespace Epsilon
         {
           if (ImGui::MenuItem("Open", "Ctrl + O"))
           {
-            std::string result = FileHelper::ShowOpenDialog();
-            if (!result.empty())
+            if(isDirty_)
             {
-              std::string content;
-              FileHelper::Load(result, content);
-              SetEditorText(content);
+              SetConfirmationModal(
+                  [this]()
+                  {
+                      std::string result = FileHelper::ShowOpenDialog();
+                      if (!result.empty())
+                      {
+                        location_ = result;
+                        std::string content;
+                        FileHelper::Load(result, content);
+                        SetEditorText(content);
+                        isDirty_ = false;
+                      }
+
+                  });
             }
+            else
+            {
+              std::string result = FileHelper::ShowOpenDialog();
+              if (!result.empty())
+              {
+                location_ = result;
+                std::string content;
+                FileHelper::Load(result, content);
+                SetEditorText(content);
+                isDirty_ = false;
+              }
+            }
+
           }
           if (ImGui::MenuItem("New Shader...", "Ctrl + N"))
           {
-            SetEditorText(startString_);
+            //give confirmation if the person has modified or not initialized a file
+            if(isDirty_)
+              SetConfirmationModal([this](){SetEditorText(startString_); isDirty_ = false;});
+            else
+              SetEditorText(startString_);
             wantFlags_ |= wNewShader;
           }
           if (ImGui::MenuItem("Save", "Ctrl + S"))
@@ -90,7 +122,12 @@ namespace Epsilon
 
             if (location_.empty())
             {
-              location_ = FileHelper::ShowSaveDialogAndSave(GetEditorString());
+              //store the new location
+              std::string newLocation = FileHelper::ShowSaveDialogAndSave(GetEditorString());
+
+              //check if a valid location was selected and set it as the new location if it is valid.
+              if(!newLocation.empty())
+                location_ = newLocation;
             }
             else
             {
@@ -99,7 +136,12 @@ namespace Epsilon
           }
           if (ImGui::MenuItem("Save As", "Ctrl + S"))
           {
-            location_ = FileHelper::ShowSaveDialogAndSave(GetEditorString());
+            //store the new location
+            std::string newLocation = FileHelper::ShowSaveDialogAndSave(GetEditorString());
+
+            //check if a valid location was selected and set it as the new location if it is valid.
+            if(!newLocation.empty())
+              location_ = newLocation;
           }
           ImGui::EndMenu();
         }
@@ -178,6 +220,7 @@ namespace Epsilon
           ImGui::CloseCurrentPopup();
           showModifiedModal_ = false;
         }
+        ImGui::SameLine();
         if (ImGui::Button("Yes"))
         {
           onModalConfirm_();
@@ -187,6 +230,17 @@ namespace Epsilon
         }
         ImGui::EndPopup();
       }
+    }
+
+    void ImGuiHandler::UpdateSideBar()
+    {
+
+    }
+
+    void ImGuiHandler::SetConfirmationModal(const std::function<void()> &onConfirmation)
+    {
+      showModifiedModal_ = true;
+      onModalConfirm_ = onConfirmation;
     }
 
 

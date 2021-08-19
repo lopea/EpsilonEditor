@@ -32,15 +32,17 @@ namespace Epsilon
 
         bool IsStartStringInit() const {return startString_ != nullptr;}
         void SetStartString(const char* string) { startString_ = string;};
-        void SetEditorText(const std::string &text) { editor_.SetText(text); }
+        void SetEditorText(const std::string &text) { editor_.SetText(text); needsUpdating_ = true; isDirty_ = false;}
         void SetErrorText(const std::string &text);
         void ClearErrorText();
         WantFlags GetWantFlags() const {return wantFlags_;}
+        void SetConfirmationModal(const std::function<void()> &onConfirmation);
     private:
         void RenderBar();
         void FindErrorMarkers();
         void ClearErrorMarkers();
         void UpdateModals();
+        void UpdateSideBar();
 
 
         ImVec2 barSize_;
@@ -48,7 +50,7 @@ namespace Epsilon
         const char * startString_ = nullptr;
         std::string location_;
         std::string errMsg_;
-        bool showModifiedModal_ = false;
+        bool showModifiedModal_ = false, isDirty_ = false, needsUpdating_ = false;
         std::function<void()> onModalConfirm_;
         WantFlags wantFlags_{};
 
