@@ -275,6 +275,12 @@ namespace Epsilon
 
         //show current resolution
         ImGui::Text("Resolution: ( %.0f, %.0f )", data.resolution[0], data.resolution[1]);
+
+        ImGui::Separator();
+
+        //show current mouse coords
+        ImGui::Text("Mouse Coords ( %.0f, %.0f ) Left Click: %s, Right Click: %s", data.mouse[0], data.mouse[1],
+                    data.mouse[2] ? "true" : "false", data.mouse[3] ? "true" : "false");
       }
       ImGui::End();
 
