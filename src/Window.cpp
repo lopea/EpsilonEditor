@@ -209,7 +209,7 @@ namespace Epsilon
       close_ = false;
       dimensions_[0] = width;
       dimensions_[1] = height;
-      currentTime = 0;
+      deltaTime_ = 0;
       last = std::chrono::high_resolution_clock::now();
 
       //get position of the window
@@ -223,6 +223,7 @@ namespace Epsilon
       glversion = glGetString(GL_VERSION);
 
       std::cout << glversion << std::endl;
+
 
       //set vsync
       PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC )DumbProcAddress("wglSwapIntervalEXT");
@@ -246,7 +247,10 @@ namespace Epsilon
       }
 
       //update time
-      currentTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - last).count();
+      deltaTime_ = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - last).count();
+
+      //update for delta time
+      last = std::chrono::high_resolution_clock::now();
 
       //get the current mouse data
       POINT mouse;

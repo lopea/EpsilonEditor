@@ -43,7 +43,7 @@ namespace Epsilon
         manager_.Update(data_, imgui_);
 
         //update any imgui calls
-        imgui_.Render();
+        imgui_.Render(data_);
 
         //render any imgui calls to the screen
         ImGuiEnvironment::Render();
@@ -95,7 +95,7 @@ namespace Epsilon
       data_.mouse[1] = data_.resolution[1] - data_.mouse[1];
 
       //update time
-      data_.time = (float)window.GetCurrentTime();
+      data_.time += (float)window.GetDeltaTime();
 
     }
 }

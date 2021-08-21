@@ -6,6 +6,7 @@
 #define EPSILONEDITOR_APP_H
 #include "Window.h"
 #include "ShaderManager.h"
+#include "UniformData.h"
 
 namespace Epsilon
 {
@@ -23,7 +24,7 @@ namespace Epsilon
         void UpdateData();
 
         //! store any data from the cpu that will get sent to the GPU
-        ShaderManager::UniformData data_{};
+        UniformData data_{};
 
         //! References the window that will show the shader on the screen
         Window window;

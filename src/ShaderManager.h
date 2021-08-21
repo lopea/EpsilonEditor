@@ -14,12 +14,6 @@ namespace Epsilon
     class ShaderManager
     {
     public:
-        struct UniformData
-        {
-            float mouse[4];
-            float resolution[2];
-            float time;
-        };
         ShaderManager();
 
 

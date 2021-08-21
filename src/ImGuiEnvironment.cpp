@@ -18,6 +18,7 @@ namespace Epsilon
 
       //initialize imgui
       ImGui::CreateContext();
+      ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
       //we're rollin
       initialized_ = true;
     }

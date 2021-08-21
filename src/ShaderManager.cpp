@@ -3,8 +3,10 @@
 //
 
 #include "ShaderManager.h"
+#include "UniformData.h"
+
 #include <glad/gl.h>
-#include <assert.h>
+#include <cassert>
 #include <imgui.h>
 #include <gl/GL.h>
 

@@ -7,6 +7,7 @@
 #include "FileHelper.h"
 #include "ImGuiEnvironment.h"
 #include "ShaderManager.h"
+#include "UniformData.h"
 
 namespace Epsilon
 {
@@ -24,28 +25,42 @@ namespace Epsilon
       startString_ = ShaderManager::GetStartShader();
     }
 
-    void ImGuiHandler::Render()
+    void ImGuiHandler::Render(UniformData &data)
     {
       ImGuiEnvironment::NewFrame();
 
-
+      //Render Menu Bar
       RenderBar();
-      if(editor_.IsTextChanged() && !needsUpdating_)
+
+      if (editor_.IsTextChanged() && !needsUpdating_)
         isDirty_ = true;
 
-      if(needsUpdating_)
+      if (needsUpdating_)
         needsUpdating_ = false;
-      ImGui::GetStyle().ChildRounding = 0;
-      ImGui::GetStyle().ChildBorderSize = 0;
+
       ImVec2 screenPos = ImGui::GetIO().DisplaySize;
-      ImGui::SetNextWindowBgAlpha(0);
+      ImGuiConfigFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
+          | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoDocking;
       ImGui::SetNextWindowSize({screenPos.x, (errMsg_.empty() ? screenPos.y : screenPos.y * .85f) - barSize_.y});
       ImGui::SetNextWindowPos({0, barSize_.y});
-      ImGui::Begin("Shader Editor", nullptr,
-                   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+      ImGui::Begin("Shader Dock", nullptr,
+                   flags);
+
+      //create dockspace
+
+      ImGui::PushStyleColor(ImGuiCol_DockingEmptyBg,0x00000000);
+      ImGui::DockSpace(ImGui::GetID("Shader Editor DockSpace"),{0,0}, 0);
+      ImGui::PopStyleColor();
+      ImGui::End();
+
+      ImGui::SetNextWindowBgAlpha(0);
+
+      //mGui::SetNextWindowDockID(ImGui::GetID("Shader Editor DockSpace"));
+      ImGui::Begin("Shader Editor", nullptr, 0);
       editor_.Render("render");
       ImGui::End();
 
+      UpdateModals();
 
       if (!errMsg_.empty())
       {
@@ -54,18 +69,22 @@ namespace Epsilon
         ImGui::SetNextWindowPos({0, ImGui::GetIO().DisplaySize.y * 0.85f});
         ImGui::SetNextWindowSize(screenPos);
         ImGui::Begin("Error Message", nullptr,
-                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoFocusOnAppearing);
+                     ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |
+                     ImGuiWindowFlags_NoFocusOnAppearing);
         ImGui::Text("%s", errMsg_.c_str());
         ImGui::End();
 
-        ImGuiEnvironment::Render();
+
       }
-      UpdateModals();
+
+      //show the side bar
+      UpdateSideBar(data);
+      ImGuiEnvironment::Render();
     }
 
     void ImGuiHandler::RenderBar()
     {
-      wantFlags_ = 0;
+
       //start menu bar process
       if (ImGui::BeginMainMenuBar())
       {
@@ -76,7 +95,7 @@ namespace Epsilon
         {
           if (ImGui::MenuItem("Open", "Ctrl + O"))
           {
-            if(isDirty_)
+            if (isDirty_)
             {
               SetConfirmationModal(
                   [this]()
@@ -92,8 +111,7 @@ namespace Epsilon
                       }
 
                   });
-            }
-            else
+            } else
             {
               std::string result = FileHelper::ShowOpenDialog();
               if (!result.empty())
@@ -110,15 +128,19 @@ namespace Epsilon
           if (ImGui::MenuItem("New Shader...", "Ctrl + N"))
           {
             //give confirmation if the person has modified or not initialized a file
-            if(isDirty_)
-              SetConfirmationModal([this](){SetEditorText(startString_); isDirty_ = false;});
+            if (isDirty_)
+              SetConfirmationModal([this]()
+                                   {
+                                       SetEditorText(startString_);
+                                       isDirty_ = false;
+                                   });
             else
               SetEditorText(startString_);
-            wantFlags_ |= wNewShader;
+
           }
           if (ImGui::MenuItem("Save", "Ctrl + S"))
           {
-            wantFlags_ |= wSave;
+
 
             if (location_.empty())
             {
@@ -126,10 +148,9 @@ namespace Epsilon
               std::string newLocation = FileHelper::ShowSaveDialogAndSave(GetEditorString());
 
               //check if a valid location was selected and set it as the new location if it is valid.
-              if(!newLocation.empty())
+              if (!newLocation.empty())
                 location_ = newLocation;
-            }
-            else
+            } else
             {
               FileHelper::Save(location_, GetEditorString());
             }
@@ -140,7 +161,7 @@ namespace Epsilon
             std::string newLocation = FileHelper::ShowSaveDialogAndSave(GetEditorString());
 
             //check if a valid location was selected and set it as the new location if it is valid.
-            if(!newLocation.empty())
+            if (!newLocation.empty())
               location_ = newLocation;
           }
           ImGui::EndMenu();
@@ -232,8 +253,30 @@ namespace Epsilon
       }
     }
 
-    void ImGuiHandler::UpdateSideBar()
+    void ImGuiHandler::UpdateSideBar(UniformData &data)
     {
+
+
+
+      ImGui::Begin("Shader Tab");
+
+      //Show and be able to edit uniforms
+      if (ImGui::CollapsingHeader("Uniforms"))
+      {
+        ImGui::Text("Time: %.2f", data.time);
+
+        //reset time
+        if (ImGui::Button("Reset Time"))
+        {
+          data.time = 0;
+        }
+
+        ImGui::Separator();
+
+        //show current resolution
+        ImGui::Text("Resolution: ( %.0f, %.0f )", data.resolution[0], data.resolution[1]);
+      }
+      ImGui::End();
 
     }
 

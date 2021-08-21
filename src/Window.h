@@ -24,7 +24,7 @@ namespace Epsilon
         [[nodiscard]] const HWND GetHandle() const {return handle_;}
         [[nodiscard]] bool WillClose() const {return close_; };
         void SwapBuffers();
-        [[nodiscard]] double GetCurrentTime() const {return currentTime;}
+        [[nodiscard]] double GetDeltaTime() const {return deltaTime_;}
         [[nodiscard]] const int* GetResolution() const { return dimensions_;}
         [[nodiscard]] const int* GetMouse() const {return mouse_;}
         [[nodiscard]] const int* GetPosition() const { return mouse_;}
@@ -36,7 +36,7 @@ namespace Epsilon
         int pos_[2]{0};
         int mouse_[4]{0};
         bool close_;
-        double currentTime;
+        double deltaTime_;
         std::chrono::time_point<std::chrono::high_resolution_clock> last;
 
         //give access for the winproc to change values directly

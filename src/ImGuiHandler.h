@@ -8,23 +8,19 @@
 #include <string>
 #include <TextEditor.h>
 #include <functional>
+
 namespace Epsilon
 {
-    enum WantFlagBit
-    {
-        wNone = 0x0,
-        wSave = 0x2,
-        wNewShader = 0x4
-    };
+    //forward declaration
+    struct UniformData;
 
-    using WantFlags = unsigned char;
 
     class ImGuiHandler
     {
     public:
         ImGuiHandler();
 
-        void Render();
+        void Render(UniformData &data);
 
         [[nodiscard]] std::string GetEditorString() const{return editor_.GetText();};
 
@@ -35,14 +31,13 @@ namespace Epsilon
         void SetEditorText(const std::string &text) { editor_.SetText(text); needsUpdating_ = true; isDirty_ = false;}
         void SetErrorText(const std::string &text);
         void ClearErrorText();
-        WantFlags GetWantFlags() const {return wantFlags_;}
         void SetConfirmationModal(const std::function<void()> &onConfirmation);
     private:
         void RenderBar();
         void FindErrorMarkers();
         void ClearErrorMarkers();
         void UpdateModals();
-        void UpdateSideBar();
+        void UpdateSideBar(UniformData& data);
 
 
         ImVec2 barSize_;
@@ -52,8 +47,6 @@ namespace Epsilon
         std::string errMsg_;
         bool showModifiedModal_ = false, isDirty_ = false, needsUpdating_ = false;
         std::function<void()> onModalConfirm_;
-        WantFlags wantFlags_{};
-
 
 
     };
