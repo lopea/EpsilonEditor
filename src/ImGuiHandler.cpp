@@ -195,7 +195,7 @@ namespace Epsilon
         std::size_t prev = pos;
 
         //check if the current line contains an error in the shader
-        std::size_t errorNum = line.find("0:");
+        std::size_t errorNum = line.find("0(");
 
         //if the current line does contain a line in the shader,
         if (errorNum != std::string::npos)

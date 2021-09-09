@@ -5,9 +5,10 @@
 #ifndef EPSILONEDITOR_WINDOW_H
 #define EPSILONEDITOR_WINDOW_H
 
-typedef struct HWND__* HWND;
-typedef struct HDC__* HDC;
-typedef struct HGLRC__* HGLRC;
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 #include <chrono>
 namespace Epsilon
 {
@@ -37,10 +38,15 @@ namespace Epsilon
         int mouse_[4]{0};
         bool close_;
         double deltaTime_;
+
         std::chrono::time_point<std::chrono::high_resolution_clock> last;
 
+#ifdef _WIN32
+        //keep a reference to the opengl library for getting functions
+        static inline HMODULE glModule_ = nullptr;
         //give access for the winproc to change values directly
-        friend __int64 __stdcall WinProc(HWND hwnd, unsigned int umsg, unsigned __int64 wparam, __int64 lparam);
+        friend LRESULT CALLBACK WinProc(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam);
+#endif
     };
 }
 

@@ -48,15 +48,16 @@ namespace Epsilon
                             const GLchar* message,
                             const void* userParam)
     {
-        std::cerr << "OPENGL Message: "  << message << std::endl;
+        if(type == GL_LEVEL_ERROR)
+            std::cerr << "OPENGL Message: "  << message << std::endl;
     }
     void *Window::DumbProcAddress(const char *location)
     {
       void *res = wglGetProcAddress(location);
       if (!res || res == (void *) 0x1 || res == (void *) 0x2 || res == (void *) 0x3 || res == (void *) -1)
       {
-        static HMODULE module = LoadLibraryA("opengl32.dll");
-        res = (void *) GetProcAddress(module, location);
+        if(!glModule_) glModule_ = LoadLibraryA("opengl32.dll");
+        res = (void *) GetProcAddress(glModule_, location);
       }
       return res;
     }
@@ -185,7 +186,7 @@ namespace Epsilon
 
 
       //create an opengl context
-      hGLRC_ = wglCreateContextAttribsARB(hDC_, 0, attribs);
+      hGLRC_ = wglCreateContextAttribsARB(hDC_, nullptr, attribs);
       if (!hGLRC_)
         exit(0xF00BA12);
 
@@ -266,6 +267,8 @@ namespace Epsilon
 
     Window::~Window()
     {
+      if(glModule_)
+          FreeLibrary(glModule_);
       wglMakeCurrent(0, 0);
       wglDeleteContext(hGLRC_);
       DeleteDC(hDC_);

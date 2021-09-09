@@ -3,7 +3,8 @@
 
 int main()
 {
+  float ret = 0.0001f;
   Epsilon::App app;
   app.Run();
-  return 0;
+  return *reinterpret_cast<int*>(&ret);
 }

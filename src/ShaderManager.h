@@ -17,7 +17,7 @@ namespace Epsilon
         ShaderManager();
 
 
-        bool CanRender() const { return program_ != 0;}
+        [[nodiscard]] bool CanRender() const { return program_ != 0;}
         void Update(const UniformData &data, ImGuiHandler &handler);
 
         ~ShaderManager();
