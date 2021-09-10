@@ -19,6 +19,7 @@ namespace Epsilon
 
         static void* DumbProcAddress(const char* location);
         Window(int width, int height);
+
         void ClearFrame();
         void SetClearColor(float r,float g, float b, float a);
         ~Window();
@@ -38,6 +39,7 @@ namespace Epsilon
         int mouse_[4]{0};
         bool close_;
         double deltaTime_;
+
 
         std::chrono::time_point<std::chrono::high_resolution_clock> last;
 
