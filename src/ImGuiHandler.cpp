@@ -255,9 +255,6 @@ namespace Epsilon
 
     void ImGuiHandler::UpdateSideBar(UniformData &data)
     {
-
-
-
       ImGui::Begin("Shader Tab");
 
       //Show and be able to edit uniforms

@@ -615,6 +615,28 @@ float scene(vec2 uv)
 }
 
 
+float introScene(vec2 uv, float t)
+{
+	float result = 0;
+	
+	float rt = mod(t, 3) * 2 - 2;
+	
+	if(rt < 0)
+		return alt0(uv);
+	else
+	{
+		float res = 1;
+		float c = W_BMS(uv, posToUV(vec2(0,1)) - vec2(0,my * ns * 2));
+		float su = W_Smith_au_lait(uv, posToUV(vec2(1,0.75) - vec2(mx* ns * 4., 0)));
+		float mu = min(W_Music(uv, posToUV(vec2(0,.65))), G_COLON(uv, posToUV(vec2(0,.65)) + vec2(mx* ns * 5,0)));
+		float f1 = W_Frums(uv, posToUV(vec2(0,.65) +  vec2(mx * ns *2,0)));
+		float bga = W_BGA(uv, posToUV(vec2(0, .5)));
+		return min(min(c,f1), min(mu, su));
+	}
+	return rt;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Main Code
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -623,8 +645,31 @@ void main()
 {
 	vec2 r = resolution , u = posToUV(uv);
 	
-	fragColor = vec4(step(scene(u), .001)) * 0.89;
+	fragColor = vec4(step(introScene(u, time), .001)) * 0.89;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
