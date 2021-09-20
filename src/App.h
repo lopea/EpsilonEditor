@@ -5,8 +5,8 @@
 #ifndef EPSILONEDITOR_APP_H
 #define EPSILONEDITOR_APP_H
 #include "Window.h"
-#include "ShaderManager.h"
-#include "UniformData.h"
+#include "Shader.h"
+#include "UniformDataBlock.h"
 
 namespace Epsilon
 {
@@ -23,14 +23,12 @@ namespace Epsilon
         //! Update any uniform data for the current frame
         void UpdateData();
 
-        //! store any data from the cpu that will get sent to the GPU
-        UniformData data_{};
 
         //! References the window that will show the shader on the screen
         Window window;
 
         //! Stores the shader that will get sent to the screen
-        ShaderManager manager_;
+        Shader manager_;
 
         //! Stores and handles any imgui data that will be used as proper UI.
         ImGuiHandler imgui_;
