@@ -22,16 +22,11 @@ add_executable(EpsilonEditor
         src/ImGuiEnvironment.cpp
         src/ImGuiEnvironment.h
         src/ShaderManager.cpp
-        src/Shader.h
+        src/ShaderManager.h
         src/ImGuiHandler.cpp
         src/ImGuiHandler.h
         src/FileHelper.cpp
-        src/FileHelper.h
-        src/ShaderBuffer.cpp
-        src/ShaderBuffer.h
-        src/Texture.cpp
-        src/Texture.h
-        src/UniformDataBlock.h src/UniformManager.cpp src/UniformManager.h src/Buffer.cpp src/Buffer.h)
+        src/FileHelper.h src/ShaderBuffer.cpp src/ShaderBuffer.h src/Texture.cpp src/Texture.h src/UniformData.h src/ContextManager.cpp src/ContextManager.h)
 
 
 target_link_libraries(EpsilonEditor OpenGL::GL glad imgui nfd stb)

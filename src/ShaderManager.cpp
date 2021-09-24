@@ -2,7 +2,7 @@
 // Created by Javier on 7/24/2021.
 //
 
-#include "Shader.h"
+#include "ShaderManager.h"
 #include "UniformData.h"
 
 #include <glad/gl.h>
@@ -40,7 +40,7 @@ data.outpos = position;\
 data.uv = uv;\
 }";
     const char startFragment[] = "#version 450\nlayout(std140, binding = 0) uniform UniformData\n{\n\tvec4 mouse;\n\tvec2 resolution;\n\tfloat time;\n};\nin InData\n{\n  vec2 uv;\n  vec2 outpos;\n};\nout vec4 fragColor;\nvoid main()\n{\n\tvec2 u = -1. + 2. * uv;\n\tvec2 r = cos(2./(u.x) * atan(u.x, u.y) + time) - sin( u+ 1./length((u )));\n\tfragColor = vec4(r.yxxy);\n}";
-    Shader::Shader()
+    ShaderManager::ShaderManager()
     : program_(0), needsUpdate_(false), data_(startFragment), fragmentHandle_(0), vertexHandle_(0)
     {
       
@@ -53,7 +53,7 @@ data.uv = uv;\
 
     }
 
-    Shader::~Shader()
+    ShaderManager::~ShaderManager()
     {
       glDeleteShader(fragmentHandle_);
       glDeleteShader(vertexHandle_);
@@ -66,7 +66,7 @@ data.uv = uv;\
 
     }
 
-    void Shader::Update(const UniformData &data, ImGuiHandler &handler)
+    void ShaderManager::Update(const UniformData &data, ImGuiHandler &handler)
     {
 
 
@@ -80,7 +80,7 @@ data.uv = uv;\
       }
     }
 
-    void Shader::InitializeShader()
+    void ShaderManager::InitializeShader()
     {
 
 //store the shader handle for the fragment stage
@@ -197,7 +197,7 @@ data.uv = uv;\
       }
     }
 
-    void Shader::Render(const UniformData &data)
+    void ShaderManager::Render(const UniformData &data)
     {
         if(CanRender())
         {
@@ -209,7 +209,7 @@ data.uv = uv;\
         }
     }
 
-    void Shader::InitializeMesh()
+    void ShaderManager::InitializeMesh()
     {
       //create buffer handles for the mesh
       glGenBuffers(1, &vbo_);
@@ -241,7 +241,7 @@ data.uv = uv;\
       glBindVertexArray(0);
     }
 
-    void Shader::ApplyUniforms(const UniformData &data)
+    void ShaderManager::ApplyUniforms(const UniformData &data)
     {
       //send the current uniform data to the shader
       glBindBuffer(GL_UNIFORM_BUFFER, ubo_);
@@ -251,7 +251,7 @@ data.uv = uv;\
       glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo_);
     }
 
-    void Shader::InitializeUniformBuffer()
+    void ShaderManager::InitializeUniformBuffer()
     {
       //create handle for the uniform buffer
       glGenBuffers(1, &ubo_);
@@ -264,7 +264,7 @@ data.uv = uv;\
 
     }
 
-    const char *Shader::GetStartShader()
+    const char *ShaderManager::GetStartShader()
     {
       return startFragment;
     }

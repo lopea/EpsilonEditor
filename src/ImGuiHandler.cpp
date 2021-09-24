@@ -6,7 +6,7 @@
 #include "ImGuiHandler.h"
 #include "FileHelper.h"
 #include "ImGuiEnvironment.h"
-#include "Shader.h"
+#include "ShaderManager.h"
 #include "UniformData.h"
 
 namespace Epsilon
@@ -21,8 +21,8 @@ namespace Epsilon
       editor_.SetPalette(palette);
 
       editor_.SetImGuiChildIgnored(true);
-      editor_.SetText(Shader::GetStartShader());
-      startString_ = Shader::GetStartShader();
+      editor_.SetText(ShaderManager::GetStartShader());
+      startString_ = ShaderManager::GetStartShader();
     }
 
     void ImGuiHandler::Render(UniformData &data)

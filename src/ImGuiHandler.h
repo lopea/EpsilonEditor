@@ -12,7 +12,7 @@
 namespace Epsilon
 {
     //forward declaration
-    class UniformDataBlock;
+    struct UniformData;
 
 
     class ImGuiHandler
@@ -20,7 +20,7 @@ namespace Epsilon
     public:
         ImGuiHandler();
 
-        void Render(UniformDataBlock &data);
+        void Render(UniformData &data);
 
         [[nodiscard]] std::string GetEditorString() const{return editor_.GetText();};
 
@@ -37,7 +37,7 @@ namespace Epsilon
         void FindErrorMarkers();
         void ClearErrorMarkers();
         void UpdateModals();
-        void UpdateSideBar(UniformDataBlock& data);
+        void UpdateSideBar(UniformData& data);
 
 
         ImVec2 barSize_;

@@ -2,8 +2,8 @@
 // Created by Javier on 7/24/2021.
 //
 
-#ifndef EPSILONEDITOR_SHADER_H
-#define EPSILONEDITOR_SHADER_H
+#ifndef EPSILONEDITOR_SHADERMANAGER_H
+#define EPSILONEDITOR_SHADERMANAGER_H
 
 #include <string>
 #include <TextEditor.h>
@@ -11,17 +11,16 @@
 
 namespace Epsilon
 {
-    class UniformDataBlock;
-    class Shader
+    class ShaderManager
     {
     public:
-        Shader();
+        ShaderManager();
 
 
         [[nodiscard]] bool CanRender() const { return program_ != 0;}
-        void Update(const UniformDataBlock &data, ImGuiHandler &handler);
+        void Update(const UniformData &data, ImGuiHandler &handler);
 
-        ~Shader();
+        ~ShaderManager();
 
         [[nodiscard]] std::string GetData() const {return data_;}
         void ForceRefresh() { needsUpdate_ = true; }
@@ -35,9 +34,9 @@ namespace Epsilon
 
         void InitializeUniformBuffer();
 
-        void ApplyUniforms(const UniformDataBlock &data);
+        void ApplyUniforms(const UniformData &data);
 
-        void Render(const UniformDataBlock &time);
+        void Render(const UniformData &time);
 
 
         unsigned program_;
@@ -52,4 +51,4 @@ namespace Epsilon
     };
 }
 
-#endif //EPSILONEDITOR_SHADER_H
+#endif //EPSILONEDITOR_SHADERMANAGER_H
