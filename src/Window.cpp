@@ -256,9 +256,11 @@ namespace Epsilon
       //get the current mouse data
       POINT mouse;
       GetCursorPos(&mouse);
+      ScreenToClient(handle_,&mouse);
 
       //update mouse data for the next frame
-      memcpy(mouse_, &mouse, sizeof(float) * 2);
+      mouse_[0] = (int)mouse.x;
+      mouse_[1] = (int)mouse.y;
 
       //swap the buffers
       ::SwapBuffers(hDC_);

@@ -83,7 +83,6 @@ namespace Epsilon
         data_.resolution[i] = (float)res[i];
         //update mouse to be in normalized window space
         float newValue = (float)mouse[i];
-        newValue -= (float)pos[i];
         newValue /= data_.resolution[i];
         data_.mouse[i] = newValue;
 
@@ -92,8 +91,7 @@ namespace Epsilon
       }
 
       //flip y value for mouse
-      data_.mouse[1] = data_.resolution[1] - data_.mouse[1];
-
+      data_.mouse[1] = 1.0f - data_.mouse[1];
       //update time
       data_.time += (float)window.GetDeltaTime();
 
