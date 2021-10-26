@@ -32,7 +32,7 @@ PIXELFORMATDESCRIPTOR pfd
 
     {
         sizeof(PIXELFORMATDESCRIPTOR), 1,
-        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, PFD_TYPE_RGBA, 32, 0,
+        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_DIRECTDRAW | PFD_DOUBLEBUFFER, PFD_TYPE_RGBA, 32, 0,
         0, 0, 0, 0, 0, 8, 0, 0,
         0, 0, 0, 0, 24, 8, 0,
         PFD_MAIN_PLANE, 0, 0, 0, 0
@@ -40,7 +40,7 @@ PIXELFORMATDESCRIPTOR pfd
 namespace Epsilon
 {
     //huge thanks for https://kg1992.github.io/articles/C++-OpenGL-glDebugMessageCallback-sample.html that helped me out
-    void glMessageCallback( GLenum source,
+    void APIENTRY glMessageCallback( GLenum source,
                             GLenum type,
                             GLuint id,
                             GLenum severity,
